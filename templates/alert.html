@@ -1,0 +1,65 @@
+<ul class="nav nav-tabs">
+    <li class="active">Send Text Alert</li>
+</ul>
+
+<form id="text_alert_form">
+<fieldset>
+
+<div class="control-group">
+  <label class="control-label" for="players">Send to</label>
+  <div class="controls">
+    <label class="checkbox">
+        <input type="checkbox" name="players[]" id="player-1" value="{{players.player1.name}}" {{players.player1.checkbox}}>
+        {{players.player1.name}} {{players.player1.no_phone_msg}}
+    </label>
+
+    {{#players.player2}}
+    <label class="checkbox">
+        <input type="checkbox" name="players[]" id="player-2" value="{{players.player2.name}}" {{players.player2.checkbox}}>
+        {{players.player2.name}} {{players.player2.no_phone_msg}}
+    </label>
+    {{/players.player2}}
+  </div>
+</div>
+
+{{#players.player2}}
+<div class="control-group">
+  <label class="control-label" for="radios">Message template</label>
+  <div class="controls">
+    <label class="radio">
+      <input type="radio" name='msg_template' value="match_now">
+      Match now
+    </label>
+    <label class="radio">
+      <input type="radio" name='msg_template' value="match_next">
+      Match next
+    </label>
+    <label class="radio">
+      <input type="radio" name='msg_template' value="match_delayed">
+      Match delayed
+    </label>
+    <label class="radio">
+      <input type="radio" name='msg_template' value="custom">
+      Custom message
+    </label>
+  </div>
+</div>
+{{/players.player2}}
+
+<!-- Textarea -->
+<div class="control-group">
+  <label class="control-label" for="text_msg">Text message</label>
+  <div class="controls">
+    <textarea id="text_msg" name="text_msg"></textarea>
+  </div>
+</div>
+
+<div id="send_text_button_wrap">
+    {{#only_one_player}}
+    <a id='send_text' href='#' class='btn'>Send alert</a>
+    {{/only_one_player}}
+</div>
+
+</fieldset>
+</form>
+

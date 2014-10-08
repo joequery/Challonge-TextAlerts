@@ -1,0 +1,32 @@
+.match_hover {
+    border: 1px solid #50C3AD;
+}
+
+.up_next {
+    border: 3px solid #000000;
+}
+
+.standby {
+    border: 3px solid #000054;
+}
+
+#extension_popup{
+    width: 300px;
+}
+
+.option-group{
+    width: 400px;
+    margin-bottom: 20px;
+}
+
+#show_phones{
+    margin-bottom: 10px;
+}
+
+.phoneicon{
+    cursor:pointer;
+}
+
+#show_modal{
+    display: none;
+}

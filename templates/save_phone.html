@@ -1,0 +1,11 @@
+<!-- Can't use a form here because challonge binds the enter key on any form
+     at this level to resubmit the username information. It's okay, we weren't
+     treating this like a real form anyway-->
+<div id="phone_submit" style="display: block;">
+    <hr>
+    <input type='hidden' id='player_name' value='{{player}}'>
+    <label for="phone_input">
+        Phone:
+        <input id="phone_input" name="phone" placeholder="Phone number" type="text" value="{{phone}}">
+    </label>
+</div>

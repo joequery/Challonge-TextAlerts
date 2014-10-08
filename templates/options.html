@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Challonge Notifier options</title>
+    <link rel="stylesheet" type="text/css" href="/assets/css/challonge.css">
+</head>
+<body>
+
+<div id="status"></div>
+
+<div class="option-group">
+    <form id="twilio">
+            <label>
+              Twilio Account SID
+              <input type="password" id="twilio_api">
+            </label>
+            <a href="#" id="api_key_visibility">(show)</a>
+    </form>
+<button id="save">Save</button>
+</div>
+
+<div class="option-group">
+    <p>Phone numbers should be cleared after every tournament.</p>
+    <button id="clear_phones">Clear phone numbers</button>
+</div>
+
+<script src="/assets/js/helpers.js"></script>
+<script src="/assets/js/options.js"></script>
+</body>
+</html>
