@@ -248,7 +248,7 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
 
 (function(){
     // Only activate on challonge bracket urls.
-    var bracket_re = new RegExp("/challonge.com/[^/]+/?$");
+    var bracket_re = new RegExp("challonge.com/[^/]+/?$");
     var matches_bracket_pattern = bracket_re.test(document.URL);
     var is_404 = document.title.search("404") != -1;
 
@@ -265,7 +265,7 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         STORAGE.get('TWILIO_KEY', function(data){
             var account_sid = data['TWILIO_KEY'];
             if(!account_sid)
-                alert("Twilio Account SID must be set in options before text alerts can be sent");
+                display_modal("<p>Twilio Account SID must be set in options before text alerts can be sent</p>");
             else
                 challonge_ui();
         });
