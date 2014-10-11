@@ -11,10 +11,15 @@
 <div class="option-group">
     <form id="twilio">
             <label>
-              Twilio Account SID
-              <input type="password" id="twilio_api">
+              Twilio gateway URL (leave blank to use JoeQuery's gateway)
+              <input type="text" id="twilio_url">
             </label>
-            <a href="#" id="api_key_visibility">(show)</a>
+            <br>
+            <label>
+              Access Token (if using your own Twilio gateway)
+              <input type="password" id="twilio_api">
+              <a href="#" id="api_key_visibility">(show)</a>
+            </label>
     </form>
 <button id="save">Save</button>
 </div>

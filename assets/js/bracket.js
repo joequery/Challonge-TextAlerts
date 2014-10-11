@@ -215,31 +215,18 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
                 send_to.push(data[k]);
             }
         }
-        STORAGE.get('TWILIO_KEY', function(data){
-            var account_sid = data['TWILIO_KEY'];
-            msg_with_tourney_name = TOURNEY_NAME + ": " + form_data.text_msg;
-            post_data = {
-                'to': send_to,
-                'body': msg_with_tourney_name,
-                'account_sid': account_sid
-            }
-            var request = new XMLHttpRequest();
-            request.open('POST', TWILIO_URL, true);
-            request.onload = function(){
-                if (request.status == 200){
-                    resp_data = JSON.parse(request.response);
-                    if(resp_data.status_code == 200){
-                        $alert_form.textContent = "Text successfully sent.";
-                    }
-                    else{
-                        var err_msg = "There was a problem sending your text. ";
-                        err_msg += resp_data.message;
-                        $alert_form.textContent = "Text successfully sent.";
-                    }
+        send_text_message(send_to, form_data.text_msg, function(request){
+            if (request.status == 200){
+                resp_data = JSON.parse(request.response);
+                if(resp_data.resp.status_code == 200){
+                    $alert_form.textContent = "Text successfully sent.";
                 }
-            };
-            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            request.send(JSON.stringify(post_data));
+                else{
+                    var err_msg = "There was a problem sending your text. ";
+                    err_msg += resp_data.message;
+                    $alert_form.textContent = err_msg;
+                }
+            }
         });
     });
 });
@@ -262,12 +249,6 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
     // tell us if we're a bracket admin.
     display_modal('<p>loading text alert extension...</p>');
     setTimeout(function(){
-        STORAGE.get('TWILIO_KEY', function(data){
-            var account_sid = data['TWILIO_KEY'];
-            if(!account_sid)
-                display_modal("<p>Twilio Account SID must be set in options before text alerts can be sent</p>");
-            else
-                challonge_ui();
-        });
+            challonge_ui();
     }, 3000);
 })();

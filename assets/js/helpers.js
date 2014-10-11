@@ -3,9 +3,15 @@
 // ===============================================================
 var STORAGE = chrome.storage.local;
 var OPTS_PREFIX = 'opts:';
-var TWILIO_URL = 'http://twilio.joequery.me/sms';
+var JOEQUERY_TWILIO_URL = 'http://twilio.joequery.me/sms';
 var ENTER_KEYCODE = 13;
-var TOURNEY_NAME = document.querySelector('#title').textContent.trim();
+var TOURNEY_NAME = (function(){
+    // Only applicable on challonge pages
+    if(document.URL.search('challonge') == -1 )
+        return '';
+    else
+        return document.querySelector('#title').textContent.trim();
+})();
 var NAMESPACE = TOURNEY_NAME + ':'
 
 // ===============================================================
@@ -261,10 +267,41 @@ var with_player_phones = function(player_names, callback){
 };
 
 // ==================================================================
+// Text message helpers
+// ==================================================================
+var send_text_message = function(to_nums, msg_body, callback){
+    var no_callback_provided = arguments.count == 2;
+    if(no_callback_provided){
+        callback = function(request){};
+    }
+
+    STORAGE.get(['ACCESS_TOKEN', 'GATEWAY_URL'], function(data){
+        var access_token = data['ACCESS_TOKEN'];
+        var gateway_url = data['GATEWAY_URL'] || JOEQUERY_TWILIO_URL;
+        msg_body = TOURNEY_NAME + ':' + msg_body;
+        post_data = {
+            'to': to_nums,
+            'body': msg_body,
+            'access_token': access_token
+        }
+        var request = new XMLHttpRequest();
+        request.open('POST', gateway_url, true);
+        request.onload = function(){
+            callback(request);
+        }
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(JSON.stringify(post_data));
+    });
+}
+
+// ==================================================================
 // Debug helpers
 // ==================================================================
 var storage_dump = function(){
     STORAGE.get(null, function(data){
         console.log(data);
+        STORAGE.getBytesInUse(null, function(bytes){
+            console.log("Bytes in use: " + bytes);
+        });
     });
 };
