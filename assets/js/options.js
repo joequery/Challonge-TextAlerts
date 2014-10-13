@@ -174,8 +174,10 @@ dynamic_child_bind($wrap, "#add_message_template", "click", function($e, evt){
     var $template = $wrap.querySelector('#new_message_template');
     var label = $template_label.value;
     var template = $template.value;
-    if(!template || !label)
+    if(!template || !label){
+        alert('A label and template must be provided');
         return;
+    }
 
     add_message_template(label, template, function(){
         $status_text.textContent = 'Message template created';
@@ -188,8 +190,10 @@ dynamic_child_bind($wrap, ".update_message_template", "click", function($e, evt)
     var $form = get_parent($e, 1);
     var label = $form.querySelector('.message_template_label').value;
     var template = $form.querySelector('.message_template').value;
-    if(!template || !label)
+    if(!template || !label){
+        alert('A label and template must be provided');
         return;
+    }
 
     var $all_update_forms = $wrap.querySelectorAll('.update_template_form');
     $all_update_forms = Array.prototype.slice.call($all_update_forms);
