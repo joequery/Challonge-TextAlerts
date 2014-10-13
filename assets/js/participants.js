@@ -5,9 +5,8 @@ var phone_icon_url = chrome.extension.getURL('assets/img/phone_icon.png');
 var phone_img_src = '<img class="phoneicon" src="' + phone_icon_url + '" alt="Edit phone number">';
 
 // =======================================================================
-// Event handlers
+// DOM helper functions
 // =======================================================================
-
 var reload_phone_icons = function(){
     var $player_lis = $wrapper_div.querySelectorAll('.participant-model');
     each_$($player_lis, function($e){
@@ -31,6 +30,17 @@ var close_edit_form = function(){
         $edit_form.style.display = 'none';
 };
 
+var display_phone_alert = function(template, context){
+    var $alert_info = document.querySelector('.alert');
+    if($alert_info)
+        $alert_info.parentElement.removeChild($alert_info);
+    var phone_alert_html = ghetto_render_template(template, context);
+    $wrapper_div.insertAdjacentHTML('beforeBegin', phone_alert_html);
+};
+
+// =======================================================================
+// Event handlers
+// =======================================================================
 dynamic_child_bind($wrapper_div, '.phoneicon', 'click', function($e){
     close_edit_form();
 
@@ -97,20 +107,23 @@ dynamic_global_bind($wrapper_div, '#phone_input', 'keyup', function($e, evt){
         return;
 
     var player_name = $wrapper_div.querySelector('#player_name').value;
-    var phone_number = $e.value.replace(/\D+/g, '');
+    var phone_number = $e.value;
 
+    // Blank is valid and indicates deletion, so we don't want to confuse this
+    // with blank after stripping non numeric characters
+    if(phone_number !== ""){
+        phone_number = $e.value.replace(/\D+/g, '');
+        // Naive US phone validation
+        if(phone_number.length != 10){
+            display_phone_alert('phone_error', {'number': $e.value });
+            return;
+        }
+    }
     set_player_phone(player_name, phone_number, function(){
         var $phone_input_form = $wrapper_div.querySelector('#phone_submit');
         $phone_input_form.parentElement.removeChild($phone_input_form);
-        var $alert_info = document.querySelector('.alert');
-        if($alert_info)
-            $alert_info.parentElement.removeChild($alert_info);
-
         var template = phone_number === '' ? 'phone_deleted': 'phone_added';
-        var phone_success_html = ghetto_render_template(template, {
-            'player': player_name
-        });
-        $wrapper_div.insertAdjacentHTML('beforeBegin', phone_success_html);
+        display_phone_alert(template, {'player': player_name });
     });
 
 });
