@@ -178,6 +178,7 @@ dynamic_child_bind($wrap, "#add_message_template", "click", function($e, evt){
         return;
 
     add_message_template(label, template, function(){
+        $status_text.textContent = 'Message template created';
         display_current_message_templates();
     });
 });
@@ -195,6 +196,7 @@ dynamic_child_bind($wrap, ".update_message_template", "click", function($e, evt)
     var form_index = $all_update_forms.indexOf($form);
 
     update_message_template(form_index, label, template, function(){
+        $status_text.textContent = 'Message template updated';
         display_current_message_templates();
     });
 });
@@ -208,6 +210,7 @@ dynamic_child_bind($wrap, ".delete_message_template", "click", function($e, evt)
     var form_index = $all_update_forms.indexOf($form);
 
     delete_message_template(form_index, function(){
+        $status_text.textContent = 'Message template deleted';
         display_current_message_templates();
     });
 });
