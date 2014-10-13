@@ -31,7 +31,7 @@ var add_message_template = function(label, template, callback){
         callback = function(){};
     }
 
-    with_message_templates(function(templates){
+    with_custom_message_templates(function(templates){
         templates.push({
             'label': label,
             'template': template
@@ -41,7 +41,7 @@ var add_message_template = function(label, template, callback){
 };
 
 var display_current_message_templates = function(){
-    with_message_templates(function(templates){
+    with_custom_message_templates(function(templates){
         var update_message_template_template = get_template('update_message_template');
         var current_templates_html = "";
         for(var i=0; i<templates.length; i++){
@@ -65,7 +65,7 @@ var update_message_template = function(index, new_label, new_template, callback)
     if(no_callback_provided){
         callback = function(){};
     }
-    with_message_templates(function(templates){
+    with_custom_message_templates(function(templates){
         templates[index] = {
             'label': new_label,
             'template': new_template
@@ -79,7 +79,7 @@ var delete_message_template = function(index, callback){
     if(no_callback_provided){
         callback = function(){};
     }
-    with_message_templates(function(templates){
+    with_custom_message_templates(function(templates){
         templates.splice(index, 1);
         save_message_templates(templates, callback);
     });

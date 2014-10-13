@@ -13,6 +13,11 @@ var TOURNEY_NAME = (function(){
         return document.querySelector('#title').textContent.trim();
 })();
 var NAMESPACE = TOURNEY_NAME + ':'
+var DEFAULT_MESSAGE_TEMPLATE_OPTIONS = [
+    "{{player1}} vs {{player2}} is starting now.",
+    "{{player1}} vs {{player2}} is next. Head to your station",
+    "{{player1}} vs {{player2}} has been delayed.",
+];
 
 // ===============================================================
 // JS Utilities
@@ -246,7 +251,7 @@ var set_player_phone = function(player_name, phone, callback){
 
     var should_delete_entry = phone === '';
     if(should_delete_entry){
-        chrome.storage.local.remove(player_name, callback);
+        STORAGE.remove(player_name, callback);
     }
     else{
         set_storage(player_name, phone, callback);
@@ -307,11 +312,22 @@ var send_text_message = function(to_nums, msg_body, callback){
 // ==================================================================
 // Message template helpers
 // ==================================================================
-var with_message_templates = function(callback){
+var with_custom_message_templates = function(callback){
     STORAGE.get(['MESSAGE_TEMPLATES'], function(data){
         var msg_templates_json = data['MESSAGE_TEMPLATES'] || '[]';
         var msg_templates_obj = JSON.parse(msg_templates_json);
         callback(msg_templates_obj);
+    });
+};
+
+var with_message_templates = function(callback){
+    with_custom_message_templates(function(templates){
+        var the_templates;
+        if(templates.length)
+            the_templates = templates;
+        else
+            the_templates = DEFAULT_MESSAGE_TEMPLATE_OPTIONS;
+        callback(the_templates);
     });
 };
 

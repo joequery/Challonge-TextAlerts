@@ -10,9 +10,30 @@ var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var focused_players = {};
 
 // ===============================================================
+// Rendering message templates
+// ===============================================================
+var render_message_templates = function(templates){
+    var rendered_html = "";
+    var message_radio_template = get_template('message_template_radio');
+    for(var i=0; i<templates.length; i++){
+        rendered_html += ghetto_mustache(message_radio_template, {
+            'index': i,
+            'label': templates[i].label
+        });
+    }
+    return rendered_html;
+};
+
+var with_message_template_radio_html = function(callback){
+    with_message_templates(function(templates){
+        var rendered_html = render_message_templates(templates);
+        callback(rendered_html);
+    });
+};
+
+// ===============================================================
 // Event handlers
 // ===============================================================
-
 /*
  * Insert the send text button into the dropdown ul on an as-needed basis. This
  * lets us not have to deal with figuring out when to remove/insert the send
@@ -96,25 +117,21 @@ dynamic_child_bind($TOURNAMENTS, "a[data-match-id]", "click", function($el, evt)
 
         var template = any_player_has_phone ? 'alert' : 'alert-no-phone';
         var match_id = $this_btn.getAttribute('data-match-id');
-        var temp_html = render_template(template, {
-            match_id: match_id,
-            players:players,
-            only_one_player: $player_spans.length == 1
+        with_message_template_radio_html(function(message_template_html){
+            var temp_html = render_template(template, {
+                match_id: match_id,
+                players:players,
+                only_one_player: $player_spans.length == 1,
+                message_templates: message_template_html
+            });
+            display_modal(temp_html);
         });
-        display_modal(temp_html);
     });
 });
 
 // ========================================================================
 // Alert form!
 // ========================================================================
-
-var MESSAGE_TEMPLATE_OPTIONS = {
-    match_now: "{{player1}} vs {{player2}} is starting now.",
-    match_next: "{{player1}} vs {{player2}} is next. Head to your station",
-    match_delayed: "{{player1}} vs {{player2}} has been delayed.",
-    custom: ""
-};
 
 /*
  * The send alert button shouldn't display unless at least one name is checked
@@ -149,18 +166,29 @@ var show_send_button_in_modal = function(){
  * have to attch the event to the body.
  */
 dynamic_child_bind($MODAL_DIV, "[name=msg_template]", "click", function($el){
-    var msg_template = MESSAGE_TEMPLATE_OPTIONS[$el.value];
+    with_message_templates(function(templates){
+        var msg_template;
 
-    // focused players is set when "Send text alert" button is clicked.
-    var msg_text = ghetto_mustache(msg_template, {
-        player1: focused_players.player1.name,
-        player2: focused_players.player2.name
+        var custom_message_requested = $el.value == 'custom';
+        if(custom_message_requested){
+            msg_template = '';
+        }
+        else{
+            // the value should only be an index at this point
+            var template_index = parseInt($el.value);
+            var msg_template = templates[template_index].template;
+        }
+        // focused players is set when "Send text alert" button is clicked.
+        var msg_text = ghetto_mustache(msg_template, {
+            player1: focused_players.player1.name,
+            player2: focused_players.player2.name
+        });
+        var $textarea = document.getElementById('text_msg');
+        $textarea.focus();
+        $textarea.value = msg_text;
+
+        show_send_button_in_modal();
     });
-    var $textarea = document.getElementById('text_msg');
-    $textarea.focus();
-    $textarea.value = msg_text;
-
-    show_send_button_in_modal();
 });
 
 dynamic_child_bind($MODAL_DIV, "[id^=player-]", "click", function($el){
