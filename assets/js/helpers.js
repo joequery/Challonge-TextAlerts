@@ -14,9 +14,18 @@ var TOURNEY_NAME = (function(){
 })();
 var NAMESPACE = TOURNEY_NAME + ':'
 var DEFAULT_MESSAGE_TEMPLATE_OPTIONS = [
-    "{{player1}} vs {{player2}} is starting now.",
-    "{{player1}} vs {{player2}} is next. Head to your station",
-    "{{player1}} vs {{player2}} has been delayed.",
+    {
+        'label': 'Match starting now',
+        'template': "{{player1}} vs {{player2}} is starting now."
+    },
+    {
+        'label': 'Match up next',
+        'template': "{{player1}} vs {{player2}} is next. Head to your station"
+    },
+    {
+        'label': 'Match delayed',
+        'template': "{{player1}} vs {{player2}} has been delayed."
+    }
 ];
 
 // ===============================================================
