@@ -170,6 +170,13 @@ var get_request = function(url){
 // ===============================================================
 // Template helper functions
 // ===============================================================
+var get_template = function(template_name){
+    var template_path = "templates/partials/" + template_name + ".html"
+    var template_url = chrome.extension.getURL(template_path);
+    var resp = get_request(template_url);
+    var raw_template = resp.responseText;
+    return raw_template;
+};
 
 /*
  * Don't include the template/ path with the template_name or the extension.
@@ -177,12 +184,7 @@ var get_request = function(url){
  */
 var render_template = function(template_name, context){
     context = arguments.length == 2 ? context : {};
-
-    var template_path = "templates/partials/" + template_name + ".html"
-    var template_url = chrome.extension.getURL(template_path);
-
-    var resp = get_request(template_url);
-    var raw_template = resp.responseText;
+    var raw_template = get_template(template_name);
     var template_html = Mustache.to_html(raw_template, context);
     return template_html;
 };
@@ -203,12 +205,7 @@ var ghetto_mustache = function(template, context){
 
 var ghetto_render_template = function(template_name, context){
     context = arguments.length == 2 ? context : {};
-
-    var template_path = "templates/partials/" + template_name + ".html"
-    var template_url = chrome.extension.getURL(template_path);
-
-    var resp = get_request(template_url);
-    var raw_template = resp.responseText;
+    var raw_template = get_template(template_name);
     var template_html = ghetto_mustache(raw_template, context);
     return template_html;
 };
@@ -219,8 +216,7 @@ var ghetto_render_template = function(template_name, context){
 var set_storage = function(key, value, callback){
     var no_callback_provided = arguments.count == 2;
     if(no_callback_provided){
-        callback = function(){
-        };
+        callback = function(){};
     }
 
     // Only way to get variable names as an object key in js
@@ -245,8 +241,7 @@ var set_player_phone = function(player_name, phone, callback){
 
     var no_callback_provided = arguments.count == 2;
     if(no_callback_provided){
-        callback = function(){
-        };
+        callback = function(){};
     }
 
     var should_delete_entry = phone === '';
@@ -308,6 +303,18 @@ var send_text_message = function(to_nums, msg_body, callback){
         request.send(JSON.stringify(post_data));
     });
 }
+
+// ==================================================================
+// Message template helpers
+// ==================================================================
+var with_message_templates = function(callback){
+    STORAGE.get(['MESSAGE_TEMPLATES'], function(data){
+        var msg_templates_json = data['MESSAGE_TEMPLATES'] || '[]';
+        var msg_templates_obj = JSON.parse(msg_templates_json);
+        callback(msg_templates_obj);
+    });
+};
+
 
 // ==================================================================
 // Debug helpers
