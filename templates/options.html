@@ -14,6 +14,9 @@
             h1{margin-top: 30px;}
             h2{margin-top: 20px;}
             #status{font-weight: bold; font-size: 20px;}
+            input[type=text], input[type=password]{
+                width: 350px;
+            }
         </style>
     </head>
     <body>
@@ -27,6 +30,25 @@
             <h2>Storage usage: <span id='storage_usage'></span></h2>
 
             <button id='clear_phones' style="font-size:18px">Clear phone numbers</button>
+
+            <h1>Custom message templates</h1>
+            <hr>
+            <p>Create your own message template. You may use {{player1}} and
+            {{player2}} to represent the names of player1 and player2
+            respectively. Message templates only show up for matches with both
+            players present</p>
+
+            <h2>Current message templates</h2>
+            <div id='current_message_templates'><p>None: using built in defaults</p></div>
+
+            <div class="option-group">
+                <form id="message_templates">
+                        <label>
+                          <h3>New message template</h3>
+                          <input type="text" id="new_message_template" placeholder="{{player1}} vs {{player2}} is starting now">
+                        </label>
+                <button id="add_message_template">Add message template</button>
+                </form>
 
             <h1>Custom SMS Gateway Options</h1>
             <hr>

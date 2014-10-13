@@ -37,7 +37,9 @@ $clear_phones_btn.addEventListener('click', function(){
     var twilio_url = $twilio_url_input.value || '';
     var options_to_keep = [
         'ACCESS_TOKEN',
-        'GATEWAY_URL'
+        'GATEWAY_URL',
+        'MESSAGE_TEMPLATES'
+
     ];
     STORAGE.get(options_to_keep, function(data){
         var options = {};
