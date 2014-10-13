@@ -1,5 +1,3 @@
-(function(){
-
 var $twilio_form = document.querySelector('#twilio');
 var $twilio_api_input = document.querySelector('#twilio_api');
 var $twilio_url_input = document.querySelector('#twilio_url');
@@ -37,13 +35,38 @@ $save_gateway_info.addEventListener('click', function(){
 $clear_phones_btn.addEventListener('click', function(){
     var twilio_api = $twilio_api_input.value || '';
     var twilio_url = $twilio_url_input.value || '';
-    // Clear all the data, but hold on to the options
-    STORAGE.clear(function(){
-        STORAGE.set({'ACCESS_TOKEN': $twilio_api_input.value}, function(){
-            STORAGE.set({'GATEWAY_URL': $twilio_url_input.value});
-            $status_text.textContent = 'Phone numbers cleared';
-            get_storage_usage();
+    var options_to_keep = [
+        'ACCESS_TOKEN',
+        'GATEWAY_URL'
+    ];
+    STORAGE.get(options_to_keep, function(data){
+        var options = {};
+        for (var d in data) {
+            if (data.hasOwnProperty(d)) {
+                if(data[d])
+                    options[d] = data[d];
+            }
+        }
+        STORAGE.clear(function(){
+            var option_keys = Object.keys(options);
+            if(!option_keys.length)
+                return;
+
+            for(var i=0; i<option_keys.length-1; i++){
+                var k = option_keys[i];
+                var q = {};
+                q[k] = options[k];
+                STORAGE.set(q);
+            }
+            var k = option_keys[option_keys.length-1];
+            var q = {};
+            q[k] = options[k];
+            STORAGE.set(q, function(){
+                $status_text.textContent = 'Phone numbers cleared';
+                get_storage_usage();
+            });
         });
+
     });
 });
 
@@ -63,6 +86,4 @@ var get_storage_usage = (function f(){
         $storage.textContent = info;
     });
     return f;
-})();
-
 })();
