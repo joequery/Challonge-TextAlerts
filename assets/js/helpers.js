@@ -302,7 +302,7 @@ var send_text_message = function(to_nums, msg_body, callback){
     STORAGE.get(['ACCESS_TOKEN', 'GATEWAY_URL'], function(data){
         var access_token = data['ACCESS_TOKEN'];
         var gateway_url = data['GATEWAY_URL'] || JOEQUERY_TWILIO_URL;
-        msg_body = TOURNEY_NAME + ':' + msg_body;
+        msg_body = TOURNEY_NAME + ': ' + msg_body;
         post_data = {
             'to': to_nums,
             'body': msg_body,
