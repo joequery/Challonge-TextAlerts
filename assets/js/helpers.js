@@ -178,7 +178,7 @@ var get_request = function(url){
 var render_template = function(template_name, context){
     context = arguments.length == 2 ? context : {};
 
-    var template_path = "templates/" + template_name + ".html"
+    var template_path = "templates/partials/" + template_name + ".html"
     var template_url = chrome.extension.getURL(template_path);
 
     var resp = get_request(template_url);
@@ -204,7 +204,7 @@ var ghetto_mustache = function(template, context){
 var ghetto_render_template = function(template_name, context){
     context = arguments.length == 2 ? context : {};
 
-    var template_path = "templates/" + template_name + ".html"
+    var template_path = "templates/partials/" + template_name + ".html"
     var template_url = chrome.extension.getURL(template_path);
 
     var resp = get_request(template_url);
