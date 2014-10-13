@@ -53,6 +53,9 @@ var display_current_message_templates = function(){
         if(current_templates_html){
             $current_message_templates.innerHTML = current_templates_html;
         }
+        else{
+            $current_message_templates.innerHTML = '<p>None: using built in defaults</p>';
+        }
 
     });
 };
