@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "Challonge Notifier",
+    "name": "Challonge Notifier (BETA)",
     "description": "Enables you to text participants when their games are about to start",
-    "version": "0.0.1",
+    "version": "0.0.2",
 
     "browser_action": {
         "default_icon": {
