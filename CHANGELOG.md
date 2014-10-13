@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.0.5
+-----
+
+* Custom message templates can be reordered
+
 0.0.4
 -----
 

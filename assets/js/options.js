@@ -44,10 +44,27 @@ var display_current_message_templates = function(){
     with_custom_message_templates(function(templates){
         var update_message_template_template = get_template('update_message_template');
         var current_templates_html = "";
+        var up_arrow_html = '<a href="#" class="move_up">&uarr;</a>'
+        var down_arrow_html = '<a href="#" class="move_down">&darr;</a>';
+
         for(var i=0; i<templates.length; i++){
+            var arrows;
+            if(i == 0){
+                if(templates.length == 1)
+                    arrows = ""
+                else
+                    arrows = down_arrow_html + down_arrow_html;
+            }
+            else if(i == templates.length - 1){
+                arrows = up_arrow_html + up_arrow_html;
+            }
+            else{
+                arrows = down_arrow_html + up_arrow_html;
+            }
             current_templates_html += ghetto_mustache(update_message_template_template,{
                 'label': templates[i].label,
                 'template': templates[i].template,
+                'arrows': arrows
             });
         }
         if(current_templates_html){
@@ -84,6 +101,26 @@ var delete_message_template = function(index, callback){
         save_message_templates(templates, callback);
     });
 };
+
+var swap_message_template = function(index1, index2, callback){
+    var no_callback_provided = arguments.count == 1;
+    if(no_callback_provided){
+        callback = function(){};
+    }
+    with_custom_message_templates(function(templates){
+        var tmp = templates[index1];
+        templates[index1] = templates[index2];
+        templates[index2] = tmp;
+        save_message_templates(templates, callback);
+    });
+};
+
+var get_update_template_form_index = function($form){
+    var $all_update_forms = $wrap.querySelectorAll('.update_template_form');
+    $all_update_forms = Array.prototype.slice.call($all_update_forms);
+    var form_index = $all_update_forms.indexOf($form);
+    return form_index;
+}
 
 // ===================================================================
 // Storage helpers
@@ -182,6 +219,8 @@ dynamic_child_bind($wrap, "#add_message_template", "click", function($e, evt){
     add_message_template(label, template, function(){
         $status_text.textContent = 'Message template created';
         display_current_message_templates();
+        $template_label.value = '';
+        $template.value = '';
     });
 });
 
@@ -194,10 +233,7 @@ dynamic_child_bind($wrap, ".update_message_template", "click", function($e, evt)
         alert('A label and template must be provided');
         return;
     }
-
-    var $all_update_forms = $wrap.querySelectorAll('.update_template_form');
-    $all_update_forms = Array.prototype.slice.call($all_update_forms);
-    var form_index = $all_update_forms.indexOf($form);
+    var form_index = get_update_template_form_index($form);
 
     update_message_template(form_index, label, template, function(){
         $status_text.textContent = 'Message template updated';
@@ -208,13 +244,27 @@ dynamic_child_bind($wrap, ".update_message_template", "click", function($e, evt)
 dynamic_child_bind($wrap, ".delete_message_template", "click", function($e, evt){
     evt.preventDefault();
     var $form = get_parent($e, 1);
-
-    var $all_update_forms = $wrap.querySelectorAll('.update_template_form');
-    $all_update_forms = Array.prototype.slice.call($all_update_forms);
-    var form_index = $all_update_forms.indexOf($form);
+    var form_index = get_update_template_form_index($form);
 
     delete_message_template(form_index, function(){
         $status_text.textContent = 'Message template deleted';
+        display_current_message_templates();
+    });
+});
+
+dynamic_child_bind($wrap, ".move_up", "click", function($e, evt){
+    evt.preventDefault();
+    var $form = get_parent($e, 1);
+    var form_index = get_update_template_form_index($form);
+    swap_message_template(form_index, form_index-1, function(){
+        display_current_message_templates();
+    });
+});
+dynamic_child_bind($wrap, ".move_down", "click", function($e, evt){
+    evt.preventDefault();
+    var $form = get_parent($e, 1);
+    var form_index = get_update_template_form_index($form);
+    swap_message_template(form_index, form_index+1, function(){
         display_current_message_templates();
     });
 });
