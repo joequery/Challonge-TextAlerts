@@ -4,15 +4,6 @@
     "description": "Enables you to text participants when their games are about to start",
     "version": "0.0.3",
 
-    "browser_action": {
-        "default_icon": {
-            "19": "assets/img/challonge_19.png",
-            "38": "assets/img/challonge_38.png"
-        },
-        "default_title": "Challonge notifier",
-        "default_popup": "templates/popup.html"
-    },
-
     "icons":{
         "128": "assets/img/challonge_128.png"
     },
