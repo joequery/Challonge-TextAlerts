@@ -27,6 +27,21 @@ var arrays_are_equal = function(a, b) {
     return true;
 };
 
+var endswith = function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+};
+
+var normalize_url = function(url){
+    var url_copy = url; // document.URL is mutable when passed in
+    if(endswith(url_copy, '#'))
+        url_copy = url_copy.substr(0, url_copy.length-1);
+
+    if(!endswith(url_copy, '/'))
+        url_copy += '/';
+
+    return url_copy;
+};
+
 // ===============================================================
 // DOM helper functions
 // ===============================================================
@@ -112,7 +127,7 @@ var init_modal_structure = function(){
     // attribute data-toggle="modal" is clicked.
     var modal_trigger_exists = !!$inner_wrap.querySelector('#show_modal');
     if(!modal_trigger_exists){
-        var span_html = "<a id='show_modal' data-toggle='modal' href='#' data-hide-loading='1'></a>";
+        var span_html = "<a id='show_modal' data-toggle='modal' href='' data-hide-loading='1'></a>";
         $inner_wrap.insertAdjacentHTML('afterbegin', span_html);
     }
 };

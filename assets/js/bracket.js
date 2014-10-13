@@ -1,39 +1,4 @@
 var challonge_ui = function(){
-close_modal();
-
-var not_a_bracket_admin = (function(){
-    var $nav_header = document.querySelector('.nav-header');
-    if(!$nav_header){
-        return true;
-    }
-    else{
-        return $nav_header.innerHTML.search("Administration") == -1;
-    }
-})();
-
-if(not_a_bracket_admin)
-    return;
-
-var tourney_has_started = (function(){
-    var $next_step = document.querySelector('.step-body');
-    var next_step_txt = $next_step.textContent;
-    var phrases_indicating_not_started = [
-        'get started',
-        'your bracket is looking good'
-    ];
-    for(var i=0; i<phrases_indicating_not_started.length; i++)
-        if(next_step_txt.search(phrases_indicating_not_started[i]) !== -1)
-            return false;
-
-    return true;
-})();
-
-if(!tourney_has_started){
-    var err = "The tournament must be started before text alerts can be sent."
-    display_modal('<p>' + err + '</p>');
-    return;
-}
-
 // ===============================================================
 // Constants / globals
 // ===============================================================
@@ -41,7 +6,7 @@ var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 
 var $MODAL_DIV = document.querySelector('#challonge_tournaments_modal div');
 var $TOURNAMENTS = document.querySelector('#challonge_tournaments');
-var SEND_BTN_HTML = "<a id='send_text' href='#' class='btn'>Send alert</a>";
+var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var focused_players = {};
 
 // ===============================================================
@@ -77,7 +42,7 @@ dynamic_child_bind($TOURNAMENTS, ".match_identifier", "mouseenter", function($e,
     var $match_edit_a = $ul.querySelector('a[data-href$="/edit"]');
     var match_id = $match_edit_a.getAttribute('data-href').split('/')[2];
 
-    var alert_li_html = "<li><a href='#' data-match-id='" + match_id + "'>Send text alert</a></li>";
+    var alert_li_html = "<li><a href='' data-match-id='" + match_id + "'>Send text alert</a></li>";
     $ul.insertAdjacentHTML('afterbegin', alert_li_html);
 });
 
@@ -236,19 +201,37 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
 (function(){
     // Only activate on challonge bracket urls.
     var bracket_re = new RegExp("challonge.com/[^/]+/?$");
-    var matches_bracket_pattern = bracket_re.test(document.URL);
+    var normalized_url = normalize_url(document.URL);
+    var matches_bracket_pattern = bracket_re.test(normalized_url);
     var is_404 = document.title.search("404") != -1;
 
-    var is_bracket_page = matches_bracket_pattern && !is_404;
-    if(!is_bracket_page)
+    var is_bracket_page_candidate = matches_bracket_pattern && !is_404;
+    if(!is_bracket_page_candidate)
         return;
 
-    // Give an arbitrary amount of time for shit to load in and hope for the best.
-    // This is already running on document idle, but some ajax calls that challonge
-    // does occur even after that. I can't find any non-ajax item I can rely on to
-    // tell us if we're a bracket admin.
-    display_modal('<p>loading text alert extension...</p>');
-    setTimeout(function(){
-            challonge_ui();
-    }, 3000);
+    // Challonge does not have anything in the raw HTML that lets us determine
+    // if we are the admin of this page. So we will request the settings
+    // page and see if we can successfully retreive it. If so, we are a bracket
+    // admin. FURTHERMORE, we cannot rely on the HTTP status code to determine
+    // success - challonge responds with a 200 regardless. We must check to see
+    // if the responseURL matches the URL we are requesting. If not, challonge
+    // has redirected us because we are not authorized.
+    var settings_url = normalized_url + 'settings';
+    var resp = get_request(settings_url);
+    if(resp.status != 200)
+        return;
+
+    var unauthorized = resp.responseURL != settings_url;
+    if(unauthorized)
+        return;
+
+    // 'Reset or Delete' in the settings page means the tournament has not
+    // been started yet.
+    var tourney_has_started = resp.responseText.search('Reset or Delete') != -1;
+    if(!tourney_has_started){
+        var err = "The tournament must be started before text alerts can be sent."
+        display_modal('<p>' + err + '</p>');
+        return;
+    }
+    challonge_ui();
 })();
