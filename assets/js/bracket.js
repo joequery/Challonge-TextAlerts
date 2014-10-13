@@ -157,6 +157,7 @@ dynamic_child_bind($MODAL_DIV, "[name=msg_template]", "click", function($el){
         player2: focused_players.player2.name
     });
     var $textarea = document.getElementById('text_msg');
+    $textarea.focus();
     $textarea.value = msg_text;
 
     show_send_button_in_modal();
