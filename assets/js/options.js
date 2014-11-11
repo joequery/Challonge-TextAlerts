@@ -51,12 +51,12 @@ var display_current_message_templates = function(){
             var arrows;
             if(i == 0){
                 if(templates.length == 1)
-                    arrows = ""
+                    arrows = "";
                 else
-                    arrows = down_arrow_html + down_arrow_html;
+                    arrows = down_arrow_html;
             }
             else if(i == templates.length - 1){
-                arrows = up_arrow_html + up_arrow_html;
+                arrows = up_arrow_html;
             }
             else{
                 arrows = down_arrow_html + up_arrow_html;
