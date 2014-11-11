@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.0.6
+-----
+
+* Switched to sync storage from localstorage. Now tournament organizers can sign
+  in to chrome using the same email to share phone numbers.
+* A link to the bracket URL can now be sent with text messages.
+
 0.0.5
 -----
 
