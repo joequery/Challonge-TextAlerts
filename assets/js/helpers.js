@@ -1,7 +1,7 @@
 // ===============================================================
 // Global constants
 // ===============================================================
-var STORAGE = chrome.storage.local;
+var STORAGE = chrome.storage.sync;
 var OPTS_PREFIX = 'opts:';
 var JOEQUERY_TWILIO_URL = 'http://twilio.joequery.me/sms';
 var ENTER_KEYCODE = 13;
