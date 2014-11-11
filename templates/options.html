@@ -50,10 +50,16 @@
 
             <h1>Custom message templates</h1>
             <hr>
-            <p>Create your own message template. You may use {{player1}} and
-            {{player2}} to represent the names of player1 and player2
-            respectively. Message templates only show up for matches with both
-            players present</p>
+            <p>Create your own message template. (Message templates only show up for matches with both
+            players present)</p>
+            <p>You may use the following variables in your message templates:</p>
+            <ul>
+                <li>{{player1}}: Will be substituted for Player 1's name</li>
+                <li>{{player2}}: Will be substituted for Player 2's name</li>
+                <li>{{bracket}}: Will be substituted for the Challonge bracket URL</li>
+            </ul>
+            <p><b>Example: </b>{{player1}} vs {{player2}} is starting now. View
+            bracket at {{bracket}}</p>
 
             <div class="option-group">
                 <h2>New message template</h2>

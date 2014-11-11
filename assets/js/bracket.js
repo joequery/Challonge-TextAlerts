@@ -7,6 +7,7 @@ var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 var $MODAL_DIV = document.querySelector('#challonge_tournaments_modal div');
 var $TOURNAMENTS = document.querySelector('#challonge_tournaments');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
+var BRACKET_URL = document.URL; // This is a safe assumption at this point.
 var focused_players = {};
 
 // ===============================================================
@@ -176,13 +177,17 @@ dynamic_child_bind($MODAL_DIV, "[name=msg_template]", "click", function($el){
         else{
             // the value should only be an index at this point
             var template_index = parseInt($el.value);
-            var msg_template = templates[template_index].template;
+            msg_template = templates[template_index].template;
         }
-        // focused players is set when "Send text alert" button is clicked.
-        var msg_text = ghetto_mustache(msg_template, {
+
+        var message_template_context = {
+            // focused players is set when "Send text alert" button is clicked.
             player1: focused_players.player1.name,
-            player2: focused_players.player2.name
-        });
+            player2: focused_players.player2.name,
+            bracket: BRACKET_URL
+        };
+        var msg_text = ghetto_mustache(msg_template, message_template_context);
+
         var $textarea = document.getElementById('text_msg');
         $textarea.focus();
         $textarea.value = msg_text;
@@ -262,5 +267,7 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         display_modal('<p>' + err + '</p>');
         return;
     }
+
+    // Finally
     challonge_ui();
 })();
