@@ -132,8 +132,8 @@ var clear_phone_storage = function(){
         'ACCESS_TOKEN',
         'GATEWAY_URL',
         'MESSAGE_TEMPLATES'
-
     ];
+
     STORAGE.get(options_to_keep, function(data){
         var options = {};
         for (var d in data) {
@@ -147,16 +147,7 @@ var clear_phone_storage = function(){
             if(!option_keys.length)
                 return;
 
-            for(var i=0; i<option_keys.length-1; i++){
-                var k = option_keys[i];
-                var q = {};
-                q[k] = options[k];
-                STORAGE.set(q);
-            }
-            var k = option_keys[option_keys.length-1];
-            var q = {};
-            q[k] = options[k];
-            STORAGE.set(q, function(){
+            STORAGE.set(options, function(){
                 $status_text.textContent = 'Phone numbers cleared';
                 display_storage_usage();
             });
