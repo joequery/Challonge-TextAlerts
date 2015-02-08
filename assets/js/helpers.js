@@ -27,6 +27,7 @@ var DEFAULT_MESSAGE_TEMPLATE_OPTIONS = [
         'template': "{{player1}} vs {{player2}} has been delayed."
     }
 ];
+var MODAL_DIV_SELECTOR = '.tournament-bracket-modal div';
 
 // ===============================================================
 // JS Utilities
@@ -150,9 +151,9 @@ var display_modal = function(modal_html){
     init_modal_structure();
     var $inner_wrap = document.querySelector('.inner-wrap');
     var $trigger = $inner_wrap.querySelector('#show_modal');
-    var $modal_div = document.querySelector('#challonge_tournaments_modal div');
-    $modal_div.innerHTML = modal_html;
+    var $modal_div = document.querySelector(MODAL_DIV_SELECTOR);
     $trigger.click();
+    $modal_div.innerHTML = modal_html;
 };
 
 var close_modal = function(){

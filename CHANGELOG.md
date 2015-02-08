@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.0.7
+-----
+
+* Updated extension to match new Challonge bracket markup
+
 0.0.6
 -----
 

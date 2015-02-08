@@ -4,8 +4,8 @@ var challonge_ui = function(){
 // ===============================================================
 var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 
-var $MODAL_DIV = document.querySelector('#challonge_tournaments_modal div');
-var $TOURNAMENTS = document.querySelector('#challonge_tournaments');
+var $MODAL_DIV = document.querySelector(MODAL_DIV_SELECTOR);
+var $TOURNAMENTS = document.querySelector('.challonge_tournaments');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
 var focused_players = {};
