@@ -12,8 +12,9 @@ var reload_phone_icons = function(){
     each_$($player_lis, function($e){
         var has_phone_icon = !!$e.querySelector('.phoneicon');
         if(!has_phone_icon){
-            var $wrench_icon = $e.querySelector('.icon-wrench');
-            $wrench_icon.insertAdjacentHTML('beforebegin', phone_img_src);
+            var $pencil_icon = $e.querySelector('.icon-pencil');
+            console.log('$pencil_icon ',$pencil_icon );
+            $pencil_icon.insertAdjacentHTML('beforebegin', phone_img_src);
         }
     });
 };
@@ -69,7 +70,7 @@ dynamic_child_bind($wrapper_div, '.phoneicon', 'click', function($e){
 
 // Having the normal edit form and the phone edit form open at the same time
 // seems to cause data loss.
-dynamic_child_bind($wrapper_div, '.icon-wrench', 'click', function($e){
+dynamic_child_bind($wrapper_div, '.icon-pencil', 'click', function($e){
     remove_phone_form();
 });
 
