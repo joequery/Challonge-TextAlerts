@@ -5,6 +5,13 @@ var phone_icon_url = chrome.extension.getURL('assets/img/phone_icon.png');
 var phone_img_src = '<img class="phoneicon" src="' + phone_icon_url + '" alt="Edit phone number">';
 
 // =======================================================================
+// Selector constants
+// =======================================================================
+var PHONE_SUBMIT_FORM_SEL = '#phone_submit';
+var PHONE_INPUT_SEL = '#phone_input';
+
+
+// =======================================================================
 // DOM helper functions
 // =======================================================================
 var reload_phone_icons = function(){
@@ -19,7 +26,7 @@ var reload_phone_icons = function(){
 };
 
 var remove_phone_form = function(){
-    var $phone_input_form = $wrapper_div.querySelector('#phone_submit');
+    var $phone_input_form = $wrapper_div.querySelector(PHONE_SUBMIT_FORM_SEL);
     if($phone_input_form)
         $phone_input_form.parentElement.removeChild($phone_input_form);
 };
@@ -38,6 +45,29 @@ var display_phone_alert = function(template, context){
     $wrapper_div.insertAdjacentHTML('beforeBegin', phone_alert_html);
 };
 
+var validate_and_save_phone_from_phone_input = function(){
+    var player_name = $wrapper_div.querySelector('#player_name').value;
+    var $phone_input = $wrapper_div.querySelector(PHONE_INPUT_SEL);
+    var phone_number = $phone_input.value;
+
+    // Blank is valid and indicates deletion, so we don't want to confuse this
+    // with blank after stripping non numeric characters
+    if(phone_number !== ""){
+        phone_number = phone_number.replace(/\D+/g, '');
+        // Naive US phone validation
+        if(phone_number.length != 10){
+            display_phone_alert('phone_error', {'number': $e.value });
+            return;
+        }
+    }
+    set_player_phone(player_name, phone_number, function(){
+        var $phone_input_form = $wrapper_div.querySelector(PHONE_SUBMIT_FORM_SEL);
+        $phone_input_form.parentElement.removeChild($phone_input_form);
+        var template = phone_number === '' ? 'phone_deleted': 'phone_added';
+        display_phone_alert(template, {'player': player_name });
+    });
+};
+
 // =======================================================================
 // Event handlers
 // =======================================================================
@@ -46,7 +76,7 @@ dynamic_child_bind($wrapper_div, '.phoneicon', 'click', function($e){
 
     var $parent_li = get_parent($e, 3);
     var player_name = $parent_li.firstElementChild.getAttribute('title');
-    var $phone_input_form = $wrapper_div.querySelector('#phone_submit');
+    var $phone_input_form = $wrapper_div.querySelector(PHONE_SUBMIT_FORM_SEL);
     if($phone_input_form){
         var forms_player_name = $phone_input_form.children[1].getAttribute('value');
         remove_phone_form();
@@ -101,31 +131,24 @@ dynamic_global_bind($wrapper_div, 'li form', 'submit', function($e){
     }, 500);
 });
 
-dynamic_global_bind($wrapper_div, '#phone_input', 'keyup', function($e, evt){
+dynamic_global_bind($wrapper_div, PHONE_INPUT_SEL, 'keyup', function($e, evt){
     var enter_key_pressed = evt.keyCode == ENTER_KEYCODE;
     if(!enter_key_pressed)
         return;
 
-    var player_name = $wrapper_div.querySelector('#player_name').value;
-    var phone_number = $e.value;
+    validate_and_save_phone_from_phone_input();
+});
 
-    // Blank is valid and indicates deletion, so we don't want to confuse this
-    // with blank after stripping non numeric characters
-    if(phone_number !== ""){
-        phone_number = $e.value.replace(/\D+/g, '');
-        // Naive US phone validation
-        if(phone_number.length != 10){
-            display_phone_alert('phone_error', {'number': $e.value });
-            return;
-        }
-    }
-    set_player_phone(player_name, phone_number, function(){
-        var $phone_input_form = $wrapper_div.querySelector('#phone_submit');
-        $phone_input_form.parentElement.removeChild($phone_input_form);
-        var template = phone_number === '' ? 'phone_deleted': 'phone_added';
-        display_phone_alert(template, {'player': player_name });
-    });
+dynamic_global_bind($wrapper_div, PHONE_SUBMIT_FORM_SEL + ' .save', 'click', function($e, evt){
+    validate_and_save_phone_from_phone_input();
+});
 
+dynamic_global_bind($wrapper_div, PHONE_SUBMIT_FORM_SEL + ' .delete', 'click', function($e, evt){
+
+    // Clearing and saving is the same as deleting.
+    var $phone_input = $wrapper_div.querySelector(PHONE_INPUT_SEL);
+    $phone_input.value = '';
+    validate_and_save_phone_from_phone_input();
 });
 
 // =======================================================================
