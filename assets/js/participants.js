@@ -13,7 +13,6 @@ var reload_phone_icons = function(){
         var has_phone_icon = !!$e.querySelector('.phoneicon');
         if(!has_phone_icon){
             var $pencil_icon = $e.querySelector('.icon-pencil');
-            console.log('$pencil_icon ',$pencil_icon );
             $pencil_icon.insertAdjacentHTML('beforebegin', phone_img_src);
         }
     });
