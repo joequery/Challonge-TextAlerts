@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.0.8
+-----
+
+* Update extension to match changes in participants markup
+
 0.0.7
 -----
 

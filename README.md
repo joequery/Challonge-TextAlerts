@@ -1,5 +1,5 @@
-Challonge Text Extension
-========================
+Challonge Text Alert
+====================
 
 This extenison alters the Challonge UI so you can send text alerts to players
 from the bracket page.
