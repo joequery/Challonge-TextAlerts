@@ -276,6 +276,14 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         return;
     }
 
+    // ===============================================================
+    // Nav insertion
+    // ===============================================================
+    var $nav = document.querySelector('ul.nav');
+    var nav_html = get_template('text_nav');
+    $nav.insertAdjacentHTML('beforeend', nav_html);
+
+
     // Finally
     challonge_ui();
 })();
