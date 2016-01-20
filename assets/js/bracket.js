@@ -9,6 +9,9 @@ var $TOURNAMENTS = document.querySelector('.tournament-bracket-wrapper');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
 var focused_players = {};
+var $SEND_TXT_BTN = document.querySelector('#send_text_btn');
+
+var send_text_active = false;
 
 // ===============================================================
 // Rendering message templates
@@ -35,6 +38,15 @@ var with_message_template_radio_html = function(callback){
 // ===============================================================
 // Event handlers
 // ===============================================================
+
+/*
+ * Clicking the Send text button toggles the send_active_text state
+ */
+$SEND_TXT_BTN.addEventListener('click', function(e){
+    e.preventDefault();
+    send_text_active = !send_text_active;
+});
+
 /*
  * Insert the send text button into the dropdown ul on an as-needed basis. This
  * lets us not have to deal with figuring out when to remove/insert the send
@@ -273,9 +285,7 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         return;
     }
 
-    // ===============================================================
     // Nav insertion
-    // ===============================================================
     var $nav = document.querySelector('ul.nav');
     var nav_html = get_template('text_nav');
     $nav.insertAdjacentHTML('afterend', nav_html);
