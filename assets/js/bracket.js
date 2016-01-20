@@ -4,10 +4,19 @@ var challonge_ui = function(){
 // ===============================================================
 var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 
+var $BODY = document.querySelector('body');
 var $MODAL_DIV = document.querySelector(MODAL_DIV_SELECTOR);
-var $TOURNAMENTS = document.querySelector('.challonge_tournaments');
+var $TOURNAMENTS = document.querySelector('.tournament-bracket-wrapper');
+var $SEND_TXT_BTN = document.querySelector('#send_text_btn');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
+var SEND_TEXT_ACTIVE_CLASS = 'send-text-active';
+
+var MATCH_SEL = '.match';
+var MATCH_BG_SEL = '.match--wrapper-background';
+var MATCH_PLAYER_SEL = '.match--player';
+var MATCH_PLAYER_NAME_SEL = '.match--player-name';
+
 var focused_players = {};
 
 // ===============================================================
@@ -32,53 +41,144 @@ var with_message_template_radio_html = function(callback){
     });
 };
 
+
+
+// ===============================================================
+// Send text state
+// ===============================================================
+var highlight_match_for_texting = function($match_wrapper){
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
+    var $players = $match_wrapper.querySelectorAll(MATCH_PLAYER_NAME_SEL);
+    var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
+
+    var match_has_players = ($players.length - $placeholders.length) > 0;
+    if(!match_has_players){
+        return;
+    }
+
+    if(is_send_text_active()){
+        $match_wrapper_bg.classList.add('active');
+    }
+};
+
+var deactivate_send_text = function(){
+    $BODY.classList.remove(SEND_TEXT_ACTIVE_CLASS);
+    var $active_send_text_match = document.querySelector(MATCH_BG_SEL+'.active');
+    if($active_send_text_match){
+        $active_send_text_match.classList.remove('active');
+    }
+};
+
+var activate_send_text = function(){
+    deactivate_send_text();
+    $BODY.classList.add(SEND_TEXT_ACTIVE_CLASS);
+    var $currently_hovered_match = document.querySelector(MATCH_SEL+':hover');
+    if($currently_hovered_match){
+        highlight_match_for_texting($currently_hovered_match);
+    }
+};
+
+var toggle_send_text = function(){
+    var send_text_active = is_send_text_active();
+    deactivate_send_text();
+    if(!send_text_active){
+        activate_send_text();
+    }
+};
+
+var is_match_active = function($match_wrapper){
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
+    return $match_wrapper_bg.classList.contains('active');
+};
+
+var is_send_text_active = function(){
+    return !!$BODY.classList.contains(SEND_TEXT_ACTIVE_CLASS);
+};
+
+/*
+ * Get the parent <svg> match element from any child within
+ */
+var get_match_from_child_element = function($el){
+    var safegard_limit = 5;
+    var $current_el = $el;
+    for(var parent_depth = 0; parent_depth < safegard_limit; parent_depth++){
+        if($current_el.tagName.toLowerCase() == 'svg'){
+            break;
+        }
+        $current_el = $current_el.parentNode;
+    }
+    if(!$current_el.tagName.toLowerCase() == 'svg'){
+        return;
+    }
+    $match = $current_el;
+    if(!is_match_active($match)){
+        return;
+    }
+
+    return $match;
+};
+
 // ===============================================================
 // Event handlers
 // ===============================================================
+
 /*
- * Insert the send text button into the dropdown ul on an as-needed basis. This
- * lets us not have to deal with figuring out when to remove/insert the send
- * text button for all elements at the same time (which will help scale with
- * larger brackets)
+ * Clicking the Send text button toggles the send_active_text state
  */
-dynamic_child_bind($TOURNAMENTS, ".match_identifier", "mouseenter", function($e, evt){
-    var $tr_parent = get_parent($e, 3);
-    var $ul = $tr_parent.querySelector('ul.dropdown-menu');
-    var $player_spans = $tr_parent.querySelectorAll('span[title]');
+$SEND_TXT_BTN.addEventListener('click', function(e){
+    e.preventDefault();
+    toggle_send_text();
+});
 
-    var match_has_players = !!$player_spans.length;
-    var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
-    if(ul_has_send_text){
-        if(!match_has_players){
-            var $send_alert_btn = $ul.querySelector('[data-match-id]');
-            $send_alert_btn.parentElement.removeChild($send_alert_btn);
-        }
-        return;
+dynamic_child_bind($TOURNAMENTS, MATCH_SEL, "mouseenter", function($el, evt){
+    var $match_wrapper = $el;
+    highlight_match_for_texting($match_wrapper);
+});
+
+dynamic_child_bind($TOURNAMENTS, MATCH_SEL, "mouseleave", function($el, evt){
+    var $match_wrapper = $el;
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
+    $match_wrapper_bg.classList.remove('active');
+});
+
+$BODY.addEventListener('keyup', function(e){
+    e.preventDefault();
+    var ESCAPE = 27;
+    var LETTER_T = 84;
+    if(e.keyCode == ESCAPE){
+        deactivate_send_text();
+        close_modal();
     }
-    else if(!match_has_players){
-        return;
+    else if(e.keyCode == LETTER_T){
+        toggle_send_text();
     }
-
-    // Even if the game can't be edited, the edit link still appears in the
-    // dom. We can still extract the match id from the edit url.
-    var $match_edit_a = $ul.querySelector('a[data-href$="/edit"]');
-    var match_id = $match_edit_a.getAttribute('data-href').split('/')[2];
-
-    var alert_li_html = "<li><a href='' data-match-id='" + match_id + "'>Send text alert</a></li>";
-    $ul.insertAdjacentHTML('afterbegin', alert_li_html);
 });
 
 /*
- * Load alert template into modal when send alert buttons are pushed.
+ * Load alert template into modal when highlighted match is clicked.
+ * We can't guarantee that .match is actually going to be clicked, so we're
+ * going to catch all the classes beginning with 'match'
  */
-dynamic_child_bind($TOURNAMENTS, "a[data-match-id]", "click", function($el, evt){
-    evt.preventDefault();
+dynamic_child_bind($TOURNAMENTS, '[class^=match]', "click", function($el, evt){
+    var $the_match = get_match_from_child_element($el);
+    if(!$the_match){
+        return;
+    }
 
-    // This structure is guaranteed
-    var $tr_parent = get_parent($el, 5);
-    var $player_spans = $tr_parent.querySelectorAll('span[title]');
+    deactivate_send_text();
+
+    var $init_player_spans = $match.querySelectorAll(MATCH_PLAYER_SEL);
+    var $player_spans = [];
+
+    // Skip over placeholders
+    for(var i=0; i<$init_player_spans.length; i++){
+        var $init_player = $init_player_spans[i];
+        var $placeholder = $init_player.querySelector('.-placeholder');
+        if(!$placeholder){
+            $player_spans.push($init_player);
+        }
+    }
     var players = {player1: null, player2: null};
-    var $this_btn = $el;
 
     // Since this Mustache implementation doesn't seem to handle Arrays too
     // well, we need a way to determine whether a person is player1 or player2.
@@ -91,7 +191,7 @@ dynamic_child_bind($TOURNAMENTS, "a[data-match-id]", "click", function($el, evt)
         // player1 instead of player0
         players["player"+(i+1)] = {};
         var player = players["player"+(i+1)];
-        player.name = $span.getAttribute('title');
+        player.name = $span.querySelector(MATCH_PLAYER_NAME_SEL).textContent;
 
         player.phone = null; // we'll get this later
         player.checkbox = "disabled=disabled";// we'll override this later if we find a phone
@@ -117,7 +217,7 @@ dynamic_child_bind($TOURNAMENTS, "a[data-match-id]", "click", function($el, evt)
         }
 
         var template = any_player_has_phone ? 'alert' : 'alert-no-phone';
-        var match_id = $this_btn.getAttribute('data-match-id');
+        var match_id = $the_match.getAttribute('data-match-id');
         with_message_template_radio_html(function(message_template_html){
             var temp_html = render_template(template, {
                 match_id: match_id,
@@ -267,6 +367,12 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         display_modal('<p>' + err + '</p>');
         return;
     }
+
+    // Nav insertion
+    var $nav = document.querySelector('ul.nav');
+    var nav_html = get_template('text_nav');
+    $nav.insertAdjacentHTML('afterend', nav_html);
+
 
     // Finally
     challonge_ui();

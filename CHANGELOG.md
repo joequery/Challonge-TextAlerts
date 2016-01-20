@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.0.9
+-----
+
+* Update extension to adapt to Challonge's new SVG UI overhaul
+
 0.0.8
 -----
 

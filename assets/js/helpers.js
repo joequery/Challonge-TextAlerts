@@ -158,7 +158,9 @@ var display_modal = function(modal_html){
 
 var close_modal = function(){
     var $close_button = document.querySelector("a[data-dismiss=modal]");
-    $close_button.click();
+    if($close_button){
+        $close_button.click();
+    }
 };
 
 // ===============================================================
