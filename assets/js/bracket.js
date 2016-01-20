@@ -5,7 +5,7 @@ var challonge_ui = function(){
 var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 
 var $MODAL_DIV = document.querySelector(MODAL_DIV_SELECTOR);
-var $TOURNAMENTS = document.querySelector('.challonge_tournaments');
+var $TOURNAMENTS = document.querySelector('.tournament-bracket-wrapper');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
 var focused_players = {};
@@ -41,12 +41,19 @@ var with_message_template_radio_html = function(callback){
  * text button for all elements at the same time (which will help scale with
  * larger brackets)
  */
-dynamic_child_bind($TOURNAMENTS, ".match_identifier", "mouseenter", function($e, evt){
-    var $tr_parent = get_parent($e, 3);
-    var $ul = $tr_parent.querySelector('ul.dropdown-menu');
-    var $player_spans = $tr_parent.querySelectorAll('span[title]');
+dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
+    var $match_wrapper = $e;
+    var $players = $match_wrapper.querySelectorAll('.match--player-name');
+    var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
 
-    var match_has_players = !!$player_spans.length;
+    var match_has_players = ($players.length - $placeholders.length) > 0;
+    if(match_has_players){
+        console.log("Match has players!");
+    }
+    else{
+        console.log("Match has NO players!");
+    }
+    /*
     var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
     if(ul_has_send_text){
         if(!match_has_players){
@@ -66,6 +73,7 @@ dynamic_child_bind($TOURNAMENTS, ".match_identifier", "mouseenter", function($e,
 
     var alert_li_html = "<li><a href='' data-match-id='" + match_id + "'>Send text alert</a></li>";
     $ul.insertAdjacentHTML('afterbegin', alert_li_html);
+    */
 });
 
 /*
