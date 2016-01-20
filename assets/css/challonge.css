@@ -45,3 +45,16 @@
     padding: 0px 0px 0px 10px;
     font-size: 16px;
 }
+
+#textnav{
+    background-color: #333333;
+    margin: 0;
+    padding: 0;
+}
+
+#textnav .nav-header{
+    margin-left: 3px;
+    margin-top: 15px;
+    color: #eeeeee;
+    letter-spacing: 1px;
+}

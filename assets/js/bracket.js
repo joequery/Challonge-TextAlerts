@@ -47,11 +47,8 @@ dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
     var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
 
     var match_has_players = ($players.length - $placeholders.length) > 0;
-    if(match_has_players){
-        console.log("Match has players!");
-    }
-    else{
-        console.log("Match has NO players!");
+    if(!match_has_players){
+        return;
     }
     /*
     var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
@@ -281,7 +278,7 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
     // ===============================================================
     var $nav = document.querySelector('ul.nav');
     var nav_html = get_template('text_nav');
-    $nav.insertAdjacentHTML('beforeend', nav_html);
+    $nav.insertAdjacentHTML('afterend', nav_html);
 
 
     // Finally
