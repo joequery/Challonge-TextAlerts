@@ -53,11 +53,15 @@ var validate_and_save_phone_from_phone_input = function(){
     // Blank is valid and indicates deletion, so we don't want to confuse this
     // with blank after stripping non numeric characters
     if(phone_number !== ""){
-        phone_number = phone_number.replace(/\D+/g, '');
-        // Naive US phone validation
-        if(phone_number.length != 10){
-            display_phone_alert('phone_error', {'number': $e.value });
-            return;
+        phone_number = phone_number.replace(/[^0-9,]+/g, '');
+        var numbers = phone_number.split(',');
+        for(var i=0; i<numbers.length; i++){
+            var number = numbers[i];
+            // Naive US phone validation
+            if(number.length != 10){
+                display_phone_alert('phone_error', {'number': number });
+                return;
+            }
         }
     }
     set_player_phone(player_name, phone_number, function(){

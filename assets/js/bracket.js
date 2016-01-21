@@ -311,7 +311,12 @@ dynamic_child_bind($MODAL_DIV, "#send_text", "click", function($el, evt){
         var send_to = [];
         for (var k in data) {
             if (data.hasOwnProperty(k)) {
-                send_to.push(data[k]);
+                // Allow for comma separated list of numbers
+                var numbers = data[k].split(',');
+                for(var i=0; i<numbers.length; i++){
+                    var number = numbers[i];
+                    send_to.push(number);
+                }
             }
         }
         send_text_message(send_to, form_data.text_msg, function(request){

@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Challonge Text Alert",
     "description": "Enables you to text participants when their games are about to start",
-    "version": "0.0.9",
+    "version": "0.0.10",
 
     "icons":{
         "128": "assets/img/challonge_128.png"

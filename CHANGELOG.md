@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.0.10
+-----
+
+* Allow for comma separated list of numbers for a single player. Works well for
+  team events.
+
 0.0.9
 -----
 
