@@ -107,18 +107,7 @@ $SEND_TXT_BTN.addEventListener('click', function(e){
  */
 dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
     var $match_wrapper = $e;
-    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
-    var $players = $match_wrapper.querySelectorAll('.match--player-name');
-    var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
-
-    var match_has_players = ($players.length - $placeholders.length) > 0;
-    if(!match_has_players){
-        return;
-    }
-
-    if(is_send_text_active()){
-        $match_wrapper_bg.classList.add('active');
-    }
+    highlight_match_for_texting($match_wrapper);
     /*
     var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
     if(ul_has_send_text){
