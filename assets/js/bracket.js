@@ -12,6 +12,10 @@ var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
 var SEND_TEXT_ACTIVE_CLASS = 'send-text-active';
 
+var MATCH_SEL = '.match';
+var MATCH_BG_SEL = '.match--wrapper-background';
+var MATCH_PLAYER_SEL = '.match--player-name'
+
 var focused_players = {};
 
 // ===============================================================
@@ -42,8 +46,8 @@ var with_message_template_radio_html = function(callback){
 // Send text state
 // ===============================================================
 var highlight_match_for_texting = function($match_wrapper){
-    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
-    var $players = $match_wrapper.querySelectorAll('.match--player-name');
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
+    var $players = $match_wrapper.querySelectorAll(MATCH_PLAYER_SEL);
     var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
 
     var match_has_players = ($players.length - $placeholders.length) > 0;
@@ -58,28 +62,34 @@ var highlight_match_for_texting = function($match_wrapper){
 
 var deactivate_send_text = function(){
     $BODY.classList.remove(SEND_TEXT_ACTIVE_CLASS);
-    var $active_send_text_match = document.querySelector('.match.active');
+    var $active_send_text_match = document.querySelector(MATCH_SEL+'.active');
+    console.dirxml('active_send_text_match', $active_send_text_match);
     if($active_send_text_match){
-        $active_send_text_match.classList.remove('.active');
+        $active_send_text_match.classList.remove('active');
     }
 };
 
 var activate_send_text = function(){
     deactivate_send_text();
     $BODY.classList.add(SEND_TEXT_ACTIVE_CLASS);
-    var $currently_hovered_match = document.querySelector('.match:hover');
+    var $currently_hovered_match = document.querySelector(MATCH_SEL+':hover');
     if($currently_hovered_match){
         highlight_match_for_texting($currently_hovered_match);
     }
 };
 
 var toggle_send_text = function(){
-    console.log("TOGGLING");
     var send_text_active = is_send_text_active();
     deactivate_send_text();
     if(!send_text_active){
         activate_send_text();
     }
+};
+
+var is_match_active = function($match_wrapper){
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
+    console.dirxml('$match_wrapper_bg ',$match_wrapper_bg);
+    return $match_wrapper_bg.classList.contains('active');
 };
 
 var is_send_text_active = function(){
@@ -94,46 +104,18 @@ var is_send_text_active = function(){
  * Clicking the Send text button toggles the send_active_text state
  */
 $SEND_TXT_BTN.addEventListener('click', function(e){
-    console.log("CLICKED YO");
     e.preventDefault();
     toggle_send_text();
 });
 
-/*
- * Insert the send text button into the dropdown ul on an as-needed basis. This
- * lets us not have to deal with figuring out when to remove/insert the send
- * text button for all elements at the same time (which will help scale with
- * larger brackets)
- */
-dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
-    var $match_wrapper = $e;
+dynamic_child_bind($TOURNAMENTS, MATCH_SEL, "mouseenter", function($el, evt){
+    var $match_wrapper = $el;
     highlight_match_for_texting($match_wrapper);
-    /*
-    var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
-    if(ul_has_send_text){
-        if(!match_has_players){
-            var $send_alert_btn = $ul.querySelector('[data-match-id]');
-            $send_alert_btn.parentElement.removeChild($send_alert_btn);
-        }
-        return;
-    }
-    else if(!match_has_players){
-        return;
-    }
-
-    // Even if the game can't be edited, the edit link still appears in the
-    // dom. We can still extract the match id from the edit url.
-    var $match_edit_a = $ul.querySelector('a[data-href$="/edit"]');
-    var match_id = $match_edit_a.getAttribute('data-href').split('/')[2];
-
-    var alert_li_html = "<li><a href='' data-match-id='" + match_id + "'>Send text alert</a></li>";
-    $ul.insertAdjacentHTML('afterbegin', alert_li_html);
-    */
 });
 
-dynamic_child_bind($TOURNAMENTS, ".match", "mouseleave", function($e, evt){
-    var $match_wrapper = $e;
-    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
+dynamic_child_bind($TOURNAMENTS, MATCH_SEL, "mouseleave", function($el, evt){
+    var $match_wrapper = $el;
+    var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
     $match_wrapper_bg.classList.remove('active');
 });
 
@@ -150,8 +132,34 @@ $BODY.addEventListener('keyup', function(e){
 });
 
 /*
- * Load alert template into modal when send alert buttons are pushed.
+ * Load alert template into modal when highlighted match is clicked.
  */
+
+// We can't guarantee that .match is actually going to be clicked, so we're
+// going to catch all the selectors beginning .match
+dynamic_child_bind($TOURNAMENTS, '[class^=match]', "click", function($el, evt){
+    var safegard_limit = 5;
+    var $current_el = $el;
+    for(var parent_depth = 0; parent_depth < safegard_limit; parent_depth++){
+        if($current_el.tagName.toLowerCase() == 'svg'){
+            break;
+        }
+        $current_el = $current_el.parentNode;
+    }
+    if(!$current_el.tagName.toLowerCase() == 'svg'){
+        return;
+    }
+    $match = $current_el;
+    if(!is_match_active($match)){
+        console.log("Match is not active!");
+        return;
+    }
+
+    console.log("Match is active!");
+
+
+});
+
 dynamic_child_bind($TOURNAMENTS, "a[data-match-id]", "click", function($el, evt){
     evt.preventDefault();
 
