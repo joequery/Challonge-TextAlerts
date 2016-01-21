@@ -58,3 +58,12 @@
     color: #eeeeee;
     letter-spacing: 1px;
 }
+
+.send-text-active .match--wrapper-background.active{
+    stroke-width:3;
+    stroke:rgb(250,115,35);
+}
+
+.send-text-active #send_nav{
+    border: 3px solid #FB7424;
+}

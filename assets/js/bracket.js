@@ -4,14 +4,15 @@ var challonge_ui = function(){
 // ===============================================================
 var GENERIC_ERR_MSG = "Something went wrong. Sorry!";
 
+var $BODY = document.querySelector('body');
 var $MODAL_DIV = document.querySelector(MODAL_DIV_SELECTOR);
 var $TOURNAMENTS = document.querySelector('.tournament-bracket-wrapper');
+var $SEND_TXT_BTN = document.querySelector('#send_text_btn');
 var SEND_BTN_HTML = "<a id='send_text' href='' class='btn'>Send alert</a>";
 var BRACKET_URL = document.URL; // This is a safe assumption at this point.
-var focused_players = {};
-var $SEND_TXT_BTN = document.querySelector('#send_text_btn');
+var SEND_TEXT_ACTIVE_CLASS = 'send-text-active';
 
-var send_text_active = false;
+var focused_players = {};
 
 // ===============================================================
 // Rendering message templates
@@ -35,6 +36,56 @@ var with_message_template_radio_html = function(callback){
     });
 };
 
+
+
+// ===============================================================
+// Send text state
+// ===============================================================
+var highlight_match_for_texting = function($match_wrapper){
+    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
+    var $players = $match_wrapper.querySelectorAll('.match--player-name');
+    var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
+
+    var match_has_players = ($players.length - $placeholders.length) > 0;
+    if(!match_has_players){
+        return;
+    }
+
+    if(is_send_text_active()){
+        $match_wrapper_bg.classList.add('active');
+    }
+};
+
+var deactivate_send_text = function(){
+    $BODY.classList.remove(SEND_TEXT_ACTIVE_CLASS);
+    var $active_send_text_match = document.querySelector('.match.active');
+    if($active_send_text_match){
+        $active_send_text_match.classList.remove('.active');
+    }
+};
+
+var activate_send_text = function(){
+    deactivate_send_text();
+    $BODY.classList.add(SEND_TEXT_ACTIVE_CLASS);
+    var $currently_hovered_match = document.querySelector('.match:hover');
+    if($currently_hovered_match){
+        highlight_match_for_texting($currently_hovered_match);
+    }
+};
+
+var toggle_send_text = function(){
+    console.log("TOGGLING");
+    var send_text_active = is_send_text_active();
+    deactivate_send_text();
+    if(!send_text_active){
+        activate_send_text();
+    }
+};
+
+var is_send_text_active = function(){
+    return !!$BODY.classList.contains(SEND_TEXT_ACTIVE_CLASS);
+};
+
 // ===============================================================
 // Event handlers
 // ===============================================================
@@ -43,8 +94,9 @@ var with_message_template_radio_html = function(callback){
  * Clicking the Send text button toggles the send_active_text state
  */
 $SEND_TXT_BTN.addEventListener('click', function(e){
+    console.log("CLICKED YO");
     e.preventDefault();
-    send_text_active = !send_text_active;
+    toggle_send_text();
 });
 
 /*
@@ -55,12 +107,17 @@ $SEND_TXT_BTN.addEventListener('click', function(e){
  */
 dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
     var $match_wrapper = $e;
+    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
     var $players = $match_wrapper.querySelectorAll('.match--player-name');
     var $placeholders = $match_wrapper.querySelectorAll('.-placeholder');
 
     var match_has_players = ($players.length - $placeholders.length) > 0;
     if(!match_has_players){
         return;
+    }
+
+    if(is_send_text_active()){
+        $match_wrapper_bg.classList.add('active');
     }
     /*
     var ul_has_send_text = !!$ul.querySelector('a[data-match-id]')
@@ -83,6 +140,24 @@ dynamic_child_bind($TOURNAMENTS, ".match", "mouseenter", function($e, evt){
     var alert_li_html = "<li><a href='' data-match-id='" + match_id + "'>Send text alert</a></li>";
     $ul.insertAdjacentHTML('afterbegin', alert_li_html);
     */
+});
+
+dynamic_child_bind($TOURNAMENTS, ".match", "mouseleave", function($e, evt){
+    var $match_wrapper = $e;
+    var $match_wrapper_bg = $match_wrapper.querySelector('.match--wrapper-background');
+    $match_wrapper_bg.classList.remove('active');
+});
+
+$BODY.addEventListener('keyup', function(e){
+    e.preventDefault();
+    var ESCAPE = 27;
+    var LETTER_T = 84;
+    if(e.keyCode == ESCAPE){
+        deactivate_send_text();
+    }
+    else if(e.keyCode == LETTER_T){
+        toggle_send_text();
+    }
 });
 
 /*
