@@ -62,8 +62,7 @@ var highlight_match_for_texting = function($match_wrapper){
 
 var deactivate_send_text = function(){
     $BODY.classList.remove(SEND_TEXT_ACTIVE_CLASS);
-    var $active_send_text_match = document.querySelector(MATCH_SEL+'.active');
-    console.dirxml('active_send_text_match', $active_send_text_match);
+    var $active_send_text_match = document.querySelector(MATCH_BG_SEL+'.active');
     if($active_send_text_match){
         $active_send_text_match.classList.remove('active');
     }
@@ -88,7 +87,6 @@ var toggle_send_text = function(){
 
 var is_match_active = function($match_wrapper){
     var $match_wrapper_bg = $match_wrapper.querySelector(MATCH_BG_SEL);
-    console.dirxml('$match_wrapper_bg ',$match_wrapper_bg);
     return $match_wrapper_bg.classList.contains('active');
 };
 
@@ -151,7 +149,6 @@ dynamic_child_bind($TOURNAMENTS, '[class^=match]', "click", function($el, evt){
     }
     $match = $current_el;
     if(!is_match_active($match)){
-        console.log("Match is not active!");
         return;
     }
 
